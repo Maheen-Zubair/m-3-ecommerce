@@ -6,46 +6,40 @@ export default function Section5b() {
   interface ProductI {
     image: string;
     quantity: number;
+    name: string;
   }
-
-  const [data, setData] = useState<ProductI[]>([]); // data from api
-  const [cart, setCart] = useState<ProductI[]>([]); // Cart mein jo data store hoga
-
-  useEffect(() => {
-    async function fetchData() {
-      let products = await (
-        await fetch('http://localhost:3000/api/TrendingProducts')
-      ).json();
-      setData(products);
-    }
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    const storedCart = localStorage.getItem('cart');
-    if (storedCart) {
-      setCart(JSON.parse(storedCart));
-    }
-  }, []);
-
-  // Add to Cart functionality
-  const addToCart = (product: ProductI) => {
-    const storedCart = localStorage.getItem('cart');
-    const cartCopy: ProductI[] = storedCart ? JSON.parse(storedCart) : [];
-
-    const existingProduct = cartCopy.find(
-      (item) => item.image === product.image
-    );
-
-    if (existingProduct) {
-      existingProduct.quantity += 1; 
-    } else {
-      cartCopy.push({ ...product, quantity: 1 });
-    }
-    localStorage.setItem('cart', JSON.stringify(cartCopy));
-    setCart(cartCopy);
-  };
-
+    const [data, setData] = useState<ProductI[]>([]); // Products fetched from API
+    const [cart, setCart] = useState<ProductI[]>([]); // Cart items
+  
+    useEffect(() => {
+      async function fetchProducts() {
+        try {
+          const response = await fetch("http://localhost:3000/api/LatestProduct");
+          const data = await response.json();
+          setData(data);
+        } catch (error) {
+          console.error("Failed to fetch products:", error);
+        }
+      }
+      fetchProducts();
+    }, []);
+  
+    const addToCart = (product: ProductI) => {
+      const updatedCart = [...cart];
+      const existingProduct = updatedCart.find(
+        (item) => item.image === product.image
+      );
+  
+      if (existingProduct) {
+        existingProduct.quantity += 1;
+      } else {
+        updatedCart.push({ ...product, quantity: 1 });
+      }
+  
+      localStorage.setItem("cart", JSON.stringify(updatedCart));
+      setCart(updatedCart);
+    };
+  
   return (
     <div className="flex flex-col text-[#151875] pt-24 pb-24 items-center gap-[10px] md:gap-[20px]">
       <h1 className="font-bold text-[30px] md:text-[38px] lg:text-[42px]">
@@ -90,4 +84,4 @@ export default function Section5b() {
       </div>
     </div>
   );
-}
+  }
