@@ -24,7 +24,7 @@ interface ProductInterface {
 }
 
 const ProductPage = () => {
-  const { detail } = useParams(); // Get the 'detail' parameter from URL
+  const { detail } = useParams(); 
   const [product, setProduct] = useState<ProductInterface | null>(null);
   const [cart, setCart] = useState<ProductInterface[]>([]);
 
@@ -58,7 +58,7 @@ const ProductPage = () => {
   };
 
   if (!product) {
-    return <p className="font-bold text-3xl">Loading or Product not found...</p>;
+    return <p className="font-bold text-3xl">Loading ....</p>;
   }
 
 
