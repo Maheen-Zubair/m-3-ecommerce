@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import { list } from "@/app/api/FeaturedProducts/data";
 
+
 interface ProductInterface {
   id: number;
   name: string;
@@ -19,49 +20,37 @@ interface ProductInterface {
   image1: string;
   image2: string;
   image3: string;
-  quantity:number
+  quantity: number;
 }
 
 const ProductPage = () => {
-  const params = useParams();
-  const detail = params.detail;
+  const { detail } = useParams(); // Get the 'detail' parameter from URL
   const [product, setProduct] = useState<ProductInterface | null>(null);
   const [cart, setCart] = useState<ProductInterface[]>([]);
 
   useEffect(() => {
     if (typeof detail === "string") {
-      const productId = parseInt(detail, 10); 
+      const productId = parseInt(detail, 10);
       const foundProduct = list.find((item) => item.id === productId);
-      if (foundProduct) {
-        setProduct(foundProduct);
-      } else {
-        console.error("Product not found!");
-      }
+      setProduct(foundProduct || null);
     } else {
-      console.error("Invalid route parameter!");
+      console.error("Invalid or missing product ID in the URL!");
     }
-    
   }, [detail]);
 
   useEffect(() => {
     const storedCart = localStorage.getItem("cart");
-    if (storedCart) {
-      setCart(JSON.parse(storedCart)); 
-    }
+    if (storedCart) setCart(JSON.parse(storedCart));
   }, []);
 
   const addToCart = (product: ProductInterface) => {
-    const storedCart = localStorage.getItem("cart");
-    const cartCopy: ProductInterface[] = storedCart ? JSON.parse(storedCart) : [];
-
-    const existingProduct = cartCopy.find(
-      (item) => item.mainimage === product.mainimage 
-    );
+    const cartCopy = [...cart];
+    const existingProduct = cartCopy.find(item => item.mainimage === product.mainimage);
 
     if (existingProduct) {
-      existingProduct.quantity += 1; 
+      existingProduct.quantity += 1;
     } else {
-      cartCopy.push({ ...product, quantity: 1 }); 
+      cartCopy.push({ ...product, quantity: 1 });
     }
 
     localStorage.setItem("cart", JSON.stringify(cartCopy));
@@ -74,7 +63,7 @@ const ProductPage = () => {
 
 
   return (
-    <div className="">
+    <div >
        <div className="lg:h-[286px] h-[120px] mt-5 md:h-[220px] w-full bg-[#F6F5FF] flex flex-col items-start justify-center">
             <div className=" flex flex-col items-start justify-center lg:pl-28 pl-10 md:pl-16">
                 <h1 className="lg:text-[36px] text-[20px] md:text-[28px] font-bold text-[#101750]">Product Details</h1>
@@ -406,4 +395,3 @@ const ProductPage = () => {
   );
 }
 export default ProductPage;
-
